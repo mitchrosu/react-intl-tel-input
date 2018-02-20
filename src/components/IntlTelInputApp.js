@@ -948,7 +948,7 @@ class IntlTelInputApp extends Component {
 
   notifyPhoneNumberChange(newNumber) {
     if (typeof this.props.onPhoneNumberChange === 'function') {
-      const fullNumber = this.formatFullNumber(newNumber);
+      const fullNumber = this.props.hideDialCode ? newNumber : this.formatFullNumber(newNumber);
       const isValid = this.isValidNumber(fullNumber);
 
       this.props.onPhoneNumberChange(
