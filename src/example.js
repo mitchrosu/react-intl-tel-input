@@ -78,6 +78,8 @@ class DemoComponent extends Component {
           defaultCountry={ 'auto' }
           value={ this.state.phone1 }
           geoIpLookup={ lookup }
+          hideDialCode
+          separateDialCode
           css={ ['intl-tel-input', 'form-control'] }
           utilsScript="libphonenumber.js"
           format

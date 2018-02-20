@@ -1048,18 +1048,24 @@ class IntlTelInputApp extends Component {
   // Either notify phoneNumber changed if component is controlled
   // or udpate the state and notify change if component is uncontrolled
   handleInputChange(e) {
-    const value = this.props.format ? this.formatNumber(e.target.value) : e.target.value;
+    const { dialCode } = this.state;
+    const { hideDialCode } = this.props;
+    const phoneRegExp = /^[\d ()+-]+$/;
+    const number = hideDialCode ? dialCode + e.target.value : e.target.value;
+    const value = this.props.format ? this.formatNumber(number) : number;
 
-    if (this.props.value !== undefined) {
-      this.updateFlagFromNumber(value);
-      this.notifyPhoneNumberChange(value);
-    } else {
-      this.setState({
-        value,
-      }, () => {
+    if (phoneRegExp.test(value)) {
+      if (this.props.value !== undefined) {
         this.updateFlagFromNumber(value);
         this.notifyPhoneNumberChange(value);
-      });
+      } else {
+        this.setState({
+          value,
+        }, () => {
+          this.updateFlagFromNumber(value);
+          this.notifyPhoneNumberChange(value);
+        });
+      }
     }
   }
 
@@ -1123,7 +1129,14 @@ class IntlTelInputApp extends Component {
     const titleTip = (this.selectedCountryData) ?
       `${this.selectedCountryData.name}: +${this.selectedCountryData.dialCode}` : 'Unknown';
 
-    const value = this.props.value !== undefined ? this.props.value : this.state.value;
+    let value = this.props.value !== undefined ? this.props.value : this.state.value;
+
+    if (this.props.hideDialCode) {
+      value = value
+        .substring(this.formatNumber(value)
+        .indexOf(this.state.dialCode) + this.state.dialCode.length)
+        .trim();
+    }
 
     return (
       <div className={ wrapperClass } style={ wrapperStyle }>
@@ -1193,6 +1206,7 @@ IntlTelInputApp.propTypes = {
   onPhoneNumberBlur: PropTypes.func,
   onSelectFlag: PropTypes.func,
   disabled: PropTypes.bool,
+  hideDialCode: PropTypes.bool,
   placeholder: PropTypes.string,
   autoFocus: PropTypes.bool,
   autoComplete: PropTypes.string,
@@ -1244,6 +1258,7 @@ IntlTelInputApp.defaultProps = {
   onPhoneNumberBlur: null,
   onSelectFlag: null,
   disabled: false,
+  hideDialCode: false,
   autoFocus: false,
   // whether to use fullscreen flag dropdown for mobile useragents
   useMobileFullscreenDropdown: true,
