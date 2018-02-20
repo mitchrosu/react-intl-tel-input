@@ -1050,11 +1050,13 @@ class IntlTelInputApp extends Component {
   handleInputChange(e) {
     const { dialCode } = this.state;
     const { hideDialCode } = this.props;
-    const phoneRegExp = /^[\d ()+-]+$/;
+    const phoneRegExp = /^[0-9]+$/;
     const number = hideDialCode ? dialCode + e.target.value : e.target.value;
     const value = this.props.format ? this.formatNumber(number) : number;
 
-    if (phoneRegExp.test(value)) {
+    const cleanNumber = value.replace(/\D/g, '');
+
+    if (phoneRegExp.test(cleanNumber)) {
       if (this.props.value !== undefined) {
         this.updateFlagFromNumber(value);
         this.notifyPhoneNumberChange(value);
@@ -1131,11 +1133,8 @@ class IntlTelInputApp extends Component {
 
     let value = this.props.value !== undefined ? this.props.value : this.state.value;
 
-    if (this.props.hideDialCode) {
-      value = value
-        .substring(this.formatNumber(value)
-        .indexOf(this.state.dialCode) + this.state.dialCode.length)
-        .trim();
+    if (this.props.hideDialCode && value.includes(this.state.dialCode)) {
+      value = value.replace(this.state.dialCode, '').trim();
     }
 
     return (
